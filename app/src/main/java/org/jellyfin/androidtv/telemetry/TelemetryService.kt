@@ -2,6 +2,7 @@ package org.jellyfin.androidtv.telemetry
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import org.acra.ACRA
 import org.acra.ReportField
 import org.acra.config.CoreConfiguration
@@ -19,8 +20,11 @@ import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.TelemetryPreferences
 import org.jellyfin.sdk.api.client.util.AuthorizationHeaderBuilder
+import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
 
 object TelemetryService {
 	/**
@@ -37,6 +41,39 @@ object TelemetryService {
 			toast {
 				text = context.getString(R.string.crash_report_toast)
 			}
+		}
+
+		Thread.setDefaultUncaughtExceptionHandler(MyUncaughtExceptionHandler(context))
+	}
+
+	class MyUncaughtExceptionHandler(val context: Context) : Thread.UncaughtExceptionHandler {
+		val default = Thread.getDefaultUncaughtExceptionHandler()
+		val fmt = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")
+		private val logfile =
+			(context.getExternalFilesDir(null) ?: context.filesDir).let { File(it, "logs/crash_${fmt.format(Date())}.log") }
+
+		init {
+
+			if (logfile.parentFile?.exists() == false) logfile.parentFile?.mkdirs()
+			if (logfile.parentFile.listFiles().size > 5) {
+				logfile.parentFile.listFiles()
+					.sortedBy { it.lastModified() }
+					.take(logfile.parentFile.listFiles().size - 5)
+					.forEach { it.delete() }
+			}
+
+		}
+
+		override fun uncaughtException(t: Thread, e: Throwable) {
+			val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+			val sb = StringBuilder()
+			sb.appendLine("${fmt.format(Date())}")
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+				sb.appendLine("isDeviceProtectedStorage:${context.isDeviceProtectedStorage}")
+			}
+			sb.appendLine("${e.fillInStackTrace().stackTraceToString()}")
+			logfile.appendText(sb.toString())
+			default.uncaughtException(t, e)
 		}
 	}
 
