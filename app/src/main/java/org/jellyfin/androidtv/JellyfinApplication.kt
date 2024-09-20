@@ -61,4 +61,8 @@ class JellyfinApplication : Application() {
 
 		TelemetryService.init(this)
 	}
+
+	override fun isDeviceProtectedStorage(): Boolean {
+		return false
+	}
 }
