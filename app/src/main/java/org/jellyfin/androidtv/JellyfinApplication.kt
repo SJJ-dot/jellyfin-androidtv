@@ -61,4 +61,8 @@ class JellyfinApplication : Application() {
 
 		TelemetryService.init(this)
 	}
+	/**
+	 * Fuck you androidx.work.
+	 */
+	override fun isDeviceProtectedStorage() = false
 }
