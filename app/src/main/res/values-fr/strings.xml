@@ -42,14 +42,13 @@
     <string name="lbl_cast_crew">Distribution et équipe</string>
     <string name="lbl_chapters">Chapitres</string>
     <string name="lbl_specials">Épisodes spéciaux</string>
-    <string name="lbl_trailers">Bandes annonces</string>
+    <string name="lbl_trailers">Bandes-annonces</string>
     <string name="lbl_items">Éléments</string>
     <string name="lbl_item">Élément</string>
     <string name="lbl_seasons">Saisons</string>
     <string name="lbl_upcoming">À venir</string>
     <string name="lbl_sd">SD</string>
     <string name="lbl_runs">Durée</string>
-    <string name="lbl_min">" min"</string>
     <string name="lbl_ends">Fin</string>
     <string name="lbl_directed_by">Réalisé par</string>
     <string name="lbl_last_played">"Dernière lecture "</string>
@@ -60,8 +59,8 @@
     <string name="lbl_none">Aucun</string>
     <string name="msg_video_playback_error">"Erreur de lecture de la vidéo - "</string>
     <string name="lbl_bracket_unknown">Inconnu</string>
-    <string name="lbl_trailer">"Bandes annonce "</string>
-    <string name="lbl_play_trailers">Lire bandes annonces</string>
+    <string name="lbl_trailer">"Bande-annonce "</string>
+    <string name="lbl_play_trailers">Lire les bandes-annonces</string>
     <string name="lbl_no">Non</string>
     <string name="lbl_yes">Oui</string>
     <string name="lbl_enter_server_address">Saisir l\'adresse du serveur</string>
@@ -206,7 +205,7 @@
     <string name="lbl_now_playing_track">%1$s sur %2$s</string>
     <string name="lbl_status">%1$s / %2$s</string>
     <string name="pref_authentication_cat">Identification</string>
-    <string name="lbl_favorite">Préféré</string>
+    <string name="lbl_favorite">Favori</string>
     <string name="lbl_image_size">Taille d\'image</string>
     <string name="lbl_image_type">Type d\'image</string>
     <string name="lbl_start_favorites">Placer les favoris en premier</string>
@@ -247,7 +246,7 @@
     <string name="no_player">Aucun lecteur</string>
     <string name="mark_watched_message">L\'élément ne semble pas avoir été joué aussi longtemps que sa durée. Marquer comme vu \?</string>
     <string name="audio_error">Incapable de jouer l\'audio %1$s</string>
-    <string name="player_error">Une erreur sur le lecteur est arrivée. Nous allons réessayer…</string>
+    <string name="player_error">Une erreur de lecture est survenue. Nous allons réessayer…</string>
     <string name="seek_error">Impossible de chercher</string>
     <string name="msg_live_tv_prev">Charger les %1$d précédentes heures \?</string>
     <string name="msg_live_tv_next">Charger les %1$d prochaines heures \?</string>
@@ -434,10 +433,10 @@
     <string name="pref_crash_reports_disabled">Les rapports de plantage ne seront pas envoyés</string>
     <string name="pref_crash_reports_enabled">Les rapports de plantage seront envoyés à votre dernier serveur utilisé</string>
     <string name="pref_crash_reports">Envoyer les rapports de plantage au serveur</string>
-    <string name="pref_telemetry_description">Envoyer les rapports de plantage, inclure les journaux</string>
+    <string name="pref_telemetry_description">Envoyer les rapports de plantage, inclus les journaux</string>
     <string name="pref_telemetry_category">Rapport de plantage</string>
     <string name="image_size_xlarge">Très grand</string>
-    <string name="image_size_smallest">Très petit</string>
+    <string name="image_size_smallest">Très petite</string>
     <string name="lbl_additional_parts">Parties additionnelles</string>
     <string name="image_type_poster">Affiche</string>
     <string name="episode_name_special">special</string>
@@ -493,7 +492,7 @@
         <item quantity="many">%1$s pistes</item>
         <item quantity="other">%1$s piste(s)</item>
     </plurals>
-    <string name="lbl_album_artists">Artistes de l\'album</string>
+    <string name="lbl_album_artists">Artistes d\'albums</string>
     <string name="disable_ui_mode_warning">Désactiver l\'avertissement du type d\'appareil</string>
     <string name="because_you_watched">Parce que vous avez regardé %1$s</string>
     <string name="photo_albums">Albums photo</string>
@@ -557,11 +556,24 @@
     <string name="continue_listening">Poursuivre l\'écoute</string>
     <string name="pref_external_player">Utiliser un lecteur externe</string>
     <string name="lbl_subtitle_background_color">Couleur d\'arrière-plan des sous-titres</string>
-    <string name="pref_subtitles_size_very_small">Très petit</string>
-    <string name="pref_subtitles_size_small">Petit</string>
-    <string name="pref_subtitles_size_normal">Normal</string>
-    <string name="pref_subtitles_size_very_large">Très gros</string>
     <string name="lbl_subtitle_text_color">Couleur des sous-titres</string>
-    <string name="pref_subtitles_size_large">Gros</string>
     <string name="lbl_subtitle_text_stroke_color">Couleur du contour des sous-titres</string>
+    <string name="video_start_delay">Délai de démarrage de la vidéo</string>
+    <string name="prefer_exoplayer_ffmpeg">Préférer FFmpeg pour la lecture audio</string>
+    <string name="prefer_exoplayer_ffmpeg_content">Utilisez FFmpeg pour décoder l\'audio, même si des codecs de plate-forme sont disponibles.</string>
+    <string name="default_video_zoom">Mode zoom par défaut</string>
+    <string name="segment_action_ask_to_skip">Demander de sauter</string>
+    <string name="pref_mediasegment_actions">Actions du segment des médias</string>
+    <string name="segment_action_nothing">Ne rien faire</string>
+    <string name="segment_action_skip">Sauter</string>
+    <string name="segment_type_commercial">Publicités</string>
+    <string name="segment_type_outro">Génériques de fin</string>
+    <string name="segment_type_intro">Génériques de début</string>
+    <string name="segment_type_preview">Aperçus</string>
+    <string name="segment_type_recap">Récapitulatifs</string>
+    <string name="segment_type_unknown">Segments inconnus</string>
+    <string name="preference_enable_trickplay">Activer trickplay dans le lecteur vidéo</string>
+    <string name="skip_forward_length">Longueur de l\'avance rapide</string>
+    <string name="runtime_hours_minutes">%1$dh %2$dm</string>
+    <string name="runtime_minutes">%1$dm</string>
 </resources>

@@ -41,10 +41,17 @@ import androidx.media3.ui.CaptionStyleCompat;
 import androidx.media3.ui.PlayerView;
 
 import org.jellyfin.androidtv.R;
+import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.preference.UserPreferences;
+import org.jellyfin.androidtv.preference.constant.ZoomMode;
+import org.jellyfin.sdk.api.client.ApiClient;
 import org.jellyfin.sdk.model.api.MediaStream;
+import org.jellyfin.sdk.model.api.MediaStreamType;
+import org.jellyfin.sdk.model.api.SubtitleDeliveryMethod;
 import org.koin.java.KoinJavaComponent;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,19 +59,14 @@ import timber.log.Timber;
 
 @OptIn(markerClass = UnstableApi.class)
 public class VideoManager {
-    public final static int ZOOM_FIT = 0;
-    public final static int ZOOM_AUTO_CROP = 1;
-    public final static int ZOOM_STRETCH = 2;
-
-    private int mZoomMode = ZOOM_FIT;
-
+    private ZoomMode mZoomMode;
     private Activity mActivity;
     private Equalizer mEqualizer;
     private DynamicsProcessing mDynamicsProcessing;
     private Limiter mLimiter;
     private PlaybackControllerNotifiable mPlaybackControllerNotifiable;
     private PlaybackOverlayFragmentHelper _helper;
-    private ExoPlayer mExoPlayer;
+    public ExoPlayer mExoPlayer;
     private PlayerView mExoPlayerView;
     private Handler mHandler = new Handler();
 
@@ -101,7 +103,7 @@ public class VideoManager {
                 strokeColor,
                 null
         );
-        mExoPlayerView.getSubtitleView().setFractionalTextSize(0.0533f *  userPreferences.get(UserPreferences.Companion.getSubtitlesTextSize()));
+        mExoPlayerView.getSubtitleView().setFractionalTextSize(0.0533f * userPreferences.get(UserPreferences.Companion.getSubtitlesTextSize()));
         mExoPlayerView.getSubtitleView().setStyle(subtitleStyle);
         mExoPlayer.addListener(new Player.Listener() {
             @Override
@@ -137,7 +139,7 @@ public class VideoManager {
 
             @Override
             public void onPlaybackParametersChanged(@NonNull PlaybackParameters playbackParameters) {
-                if (mPlaybackControllerNotifiable != null){
+                if (mPlaybackControllerNotifiable != null) {
                     mPlaybackControllerNotifiable.onPlaybackSpeedChange(playbackParameters.speed);
                 }
             }
@@ -162,7 +164,7 @@ public class VideoManager {
         });
     }
 
-    public void subscribe(@NonNull PlaybackControllerNotifiable notifier){
+    public void subscribe(@NonNull PlaybackControllerNotifiable notifier) {
         mPlaybackControllerNotifiable = notifier;
     }
 
@@ -215,20 +217,20 @@ public class VideoManager {
         return mExoPlayer != null;
     }
 
-    public int getZoomMode() {
+    public @NonNull ZoomMode getZoomMode() {
         return mZoomMode;
     }
 
-    public void setZoom(int mode) {
+    public void setZoom(@NonNull ZoomMode mode) {
         mZoomMode = mode;
         switch (mode) {
-            case ZOOM_FIT:
+            case FIT:
                 mExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
                 break;
-            case ZOOM_AUTO_CROP:
+            case AUTO_CROP:
                 mExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
                 break;
-            case ZOOM_STRETCH:
+            case STRETCH:
                 mExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
                 break;
         }
@@ -318,7 +320,15 @@ public class VideoManager {
         return pos;
     }
 
-    public void setVideoPath(@Nullable String path) {
+    private int getSubtitleSelectionFlags(MediaStream mediaStream) {
+        int flags = 0;
+        if (mediaStream.isDefault()) flags &= C.SELECTION_FLAG_DEFAULT;
+        if (mediaStream.isForced()) flags &= C.SELECTION_FLAG_FORCED;
+        return flags;
+    }
+
+    public void setMediaStreamInfo(ApiClient api, StreamInfo streamInfo) {
+        String path = streamInfo.getMediaUrl();
         if (path == null) {
             Timber.w("Video path is null cannot continue");
             return;
@@ -326,7 +336,31 @@ public class VideoManager {
         Timber.i("Video path set to: %s", path);
 
         try {
-            mExoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(path)));
+            // Add external subtitles
+            List<MediaItem.SubtitleConfiguration> subtitleConfigurations = new ArrayList<>();
+            for (MediaStream mediaStream : streamInfo.getMediaSource().getMediaStreams()) {
+                if (mediaStream.getType() != MediaStreamType.SUBTITLE) continue;
+
+                if (mediaStream.getDeliveryMethod() == SubtitleDeliveryMethod.EXTERNAL) {
+                    Uri subtitleUri = Uri.parse(api.createUrl(mediaStream.getDeliveryUrl(), Collections.emptyMap(), Collections.emptyMap(), true));
+                    MediaItem.SubtitleConfiguration subtitleConfiguration = new MediaItem.SubtitleConfiguration.Builder(subtitleUri)
+                            .setId("JF_EXTERNAL:" + String.valueOf(mediaStream.getIndex()))
+                            .setMimeType(VideoManagerHelperKt.getSubtitleMediaStreamCodec(mediaStream))
+                            .setLanguage(mediaStream.getLanguage())
+                            .setLabel(mediaStream.getDisplayTitle())
+                            .setSelectionFlags(getSubtitleSelectionFlags(mediaStream))
+                            .build();
+                    Timber.i("Adding subtitle track %s of type %s", subtitleConfiguration.uri, subtitleConfiguration.mimeType);
+                    subtitleConfigurations.add(subtitleConfiguration);
+                }
+            }
+
+            MediaItem mediaItem = new MediaItem.Builder()
+                    .setUri(Uri.parse(path))
+                    .setSubtitleConfigurations(subtitleConfigurations)
+                    .build();
+
+            mExoPlayer.setMediaItem(mediaItem);
             mExoPlayer.prepare();
         } catch (IllegalStateException e) {
             Timber.e(e, "Unable to set video path.  Probably backing out.");
@@ -381,7 +415,11 @@ public class VideoManager {
                         if (trackFormat.id != null) {
                             int id;
                             try {
-                                id = Integer.parseInt(trackFormat.id);
+                                if (trackFormat.id.contains(":")) {
+                                    id = Integer.parseInt(trackFormat.id.split(":")[1]);
+                                } else {
+                                    id = Integer.parseInt(trackFormat.id);
+                                }
                             } catch (NumberFormatException e) {
                                 Timber.d("failed to parse track ID [%s]", trackFormat.id);
                                 break;
@@ -442,14 +480,18 @@ public class VideoManager {
                 Format trackFormat = group.getFormat(i);
 
                 Timber.d("track %s group %s/%s trackType %s label %s mime %s isSelected %s isSupported %s",
-                        trackFormat.id, i+1, group.length, trackType, trackFormat.label, trackFormat.sampleMimeType, isSelected, isSupported);
+                        trackFormat.id, i + 1, group.length, trackType, trackFormat.label, trackFormat.sampleMimeType, isSelected, isSupported);
 
                 if (trackType != chosenTrackType || trackFormat.id == null)
                     continue;
 
                 int id;
                 try {
-                    id = Integer.parseInt(trackFormat.id);
+                    if (trackFormat.id.contains(":")) {
+                        id = Integer.parseInt(trackFormat.id.split(":")[1]);
+                    } else {
+                        id = Integer.parseInt(trackFormat.id);
+                    }
                     if (id != exoTrackID)
                         continue;
                 } catch (NumberFormatException e) {
@@ -486,7 +528,7 @@ public class VideoManager {
         return true;
     }
 
-    public float getPlaybackSpeed(){
+    public float getPlaybackSpeed() {
         if (!isInitialized()) {
             return 1.0f;
         } else {
@@ -559,6 +601,7 @@ public class VideoManager {
     }
 
     private Runnable progressLoop;
+
     private void startProgressLoop() {
         stopProgressLoop();
         progressLoop = new Runnable() {

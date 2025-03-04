@@ -66,7 +66,6 @@
     <string name="grid_direction_horizontal">Horisontaalne</string>
     <string name="lbl_upcoming">Tulemas</string>
     <string name="bitrate_mbit">%1$,.0f Mbit/s</string>
-    <string name="lbl_min">" -min"</string>
     <string name="lbl_ends">Lõppeb</string>
     <string name="lbl_videos">Videod</string>
     <string name="lbl_none">Puudub</string>
@@ -510,11 +509,6 @@
     <string name="lbl_subtitle_text_color">Subtiitrite teksti värv</string>
     <string name="lbl_subtitle_background_color">Subtiitrite tausta värv</string>
     <string name="lbl_subtitle_text_stroke_color">Subtiitrite piirjoone värv</string>
-    <string name="pref_subtitles_size_very_small">Väga väike</string>
-    <string name="pref_subtitles_size_small">Väike</string>
-    <string name="pref_subtitles_size_normal">Normaalne</string>
-    <string name="pref_subtitles_size_large">Suur</string>
-    <string name="pref_subtitles_size_very_large">Väga suur</string>
     <string name="indicator_subtitles">CC Subtiitrid</string>
     <string name="clear_image_cache">Puhasta pildi vahemälu</string>
     <string name="pref_screensaver_ageratingmax_unlimited">Keela maksimaalne</string>

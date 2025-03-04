@@ -43,7 +43,6 @@
     <string name="lbl_upcoming">即将上映</string>
     <string name="lbl_sd">标清</string>
     <string name="lbl_runs">时长</string>
-    <string name="lbl_min">" 分钟"</string>
     <string name="lbl_ends">结束</string>
     <string name="lbl_directed_by">导演</string>
     <string name="lbl_last_played">"上次播放 "</string>
@@ -234,7 +233,7 @@
     <string name="pref_button_remapping_description">按电视遥控器上的任何按钮进行分配</string>
     <string name="pref_subtitle_track_button">字幕选择按键</string>
     <string name="pref_audio_track_button">音轨按键</string>
-    <string name="lbl_unknown_key">未知 (%1s)</string>
+    <string name="lbl_unknown_key">未知(%1s)</string>
     <string name="bitrate_kbit">%1$,.0f 千比特/秒</string>
     <string name="bitrate_mbit">%1$,.0f 兆比特/秒</string>
     <string name="no_player_message">你似乎没有安装可播放视频的应用。此选项需要您安装第三方应用来播放视频内容。</string>
@@ -494,20 +493,20 @@
     <string name="person_birthday_and_age">出生于 %1$s (%2$d)</string>
     <string name="dolby_vision">杜比视界</string>
     <plurals name="items">
-        <item quantity="other">选项</item>
+        <item quantity="other">%1$s 选项</item>
     </plurals>
     <plurals name="movies">
-        <item quantity="other">电影</item>
+        <item quantity="other">%1$s 电影</item>
     </plurals>
     <plurals name="songs">
-        <item quantity="other">歌曲</item>
+        <item quantity="other">%1$s歌曲</item>
     </plurals>
     <plurals name="albums">
-        <item quantity="other">相册,专辑</item>
+        <item quantity="other">%1$s 合集</item>
     </plurals>
     <string name="dolby_atmos">杜比全景声</string>
     <plurals name="tv_series">
-        <item quantity="other">电视剧</item>
+        <item quantity="other">%1$s 电视剧</item>
     </plurals>
     <string name="clear_image_cache">清除图片缓存</string>
     <string name="dts_x">DTS:X</string>
@@ -539,11 +538,28 @@
     <string name="lbl_subtitle_text_color">字幕文字颜色</string>
     <string name="lbl_subtitle_background_color">字幕背景颜色</string>
     <string name="lbl_subtitle_text_stroke_color">字幕描边颜色</string>
-    <string name="pref_subtitles_size_very_small">很小</string>
-    <string name="pref_subtitles_size_small">小</string>
-    <string name="pref_subtitles_size_normal">正常</string>
-    <string name="pref_subtitles_size_large">大</string>
-    <string name="pref_subtitles_size_very_large">很大</string>
     <string name="prefer_exoplayer_ffmpeg_content">使用 FFmpeg 解码音频，即使平台编解码器可用。</string>
     <string name="prefer_exoplayer_ffmpeg">首选 FFmpeg 进行音频播放</string>
+    <string name="video_start_delay">视频启动延迟</string>
+    <string name="pref_mediasegment_actions">媒体片段动作</string>
+    <string name="segment_type_outro">片尾</string>
+    <string name="segment_action_nothing">无动作</string>
+    <string name="segment_action_skip">跳过</string>
+    <string name="segment_type_commercial">广告</string>
+    <string name="segment_type_intro">片头</string>
+    <string name="segment_type_preview">预告</string>
+    <string name="segment_type_recap">前情提要</string>
+    <string name="segment_type_unknown">未知片段</string>
+    <string name="segment_action_ask_to_skip">请求跳过</string>
+    <string name="default_video_zoom">默认缩放模式</string>
+    <string name="preference_enable_trickplay">在视频播放器中启用特技播放</string>
+    <string name="skip_forward_length">向前跳过长度</string>
+    <string name="runtime_minutes">%1$d分钟</string>
+    <string name="runtime_hours_minutes">%1$d小时 %2$d分钟</string>
+    <string name="pref_subtitles_background_opacity">字幕背景不透明度</string>
+    <string name="pref_report_device_profile_failure">无法提交文件。你的 Jellyfin 服务器可能不允许用户端日志。</string>
+    <string name="pref_troubleshooting">疑难排解</string>
+    <string name="pref_report_device_profile_title">向服务器回报播放能力</string>
+    <string name="pref_report_device_profile_summary">上传含有播放能力的疑难排解文件至伺服器</string>
+    <string name="pref_report_device_profile_success">文件已提交为 %1$s</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.ui.playback.MediaManager
@@ -14,7 +15,7 @@ import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.util.PlaybackHelper
-import org.jellyfin.apiclient.interaction.Response
+import org.jellyfin.androidtv.util.apiclient.Response
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.instantMixApi
 import org.jellyfin.sdk.api.client.extensions.itemsApi
@@ -24,7 +25,6 @@ import org.jellyfin.sdk.api.client.extensions.userLibraryApi
 import org.jellyfin.sdk.api.client.extensions.videosApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
-import org.jellyfin.sdk.model.api.ItemFields
 import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.extensions.inWholeTicks
@@ -83,18 +83,10 @@ class SdkPlaybackHelper(
 					startItemId = mainItem.id,
 					isMissing = false,
 					limit = ITEM_QUERY_LIMIT,
-					fields = setOf(
-						ItemFields.MEDIA_SOURCES,
-						ItemFields.MEDIA_STREAMS,
-						ItemFields.CHAPTERS,
-						ItemFields.PATH,
-						ItemFields.OVERVIEW,
-						ItemFields.PRIMARY_IMAGE_ASPECT_RATIO,
-						ItemFields.CHILD_COUNT,
-					)
+					fields = ItemRepository.itemFields
 				)
 
-				response.items.orEmpty()
+				response.items
 			} else {
 				listOf(mainItem)
 			}
@@ -112,18 +104,10 @@ class SdkPlaybackHelper(
 				sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else listOf(ItemSortBy.SORT_NAME),
 				recursive = true,
 				limit = ITEM_QUERY_LIMIT,
-				fields = setOf(
-					ItemFields.MEDIA_SOURCES,
-					ItemFields.MEDIA_STREAMS,
-					ItemFields.CHAPTERS,
-					ItemFields.PATH,
-					ItemFields.OVERVIEW,
-					ItemFields.PRIMARY_IMAGE_ASPECT_RATIO,
-					ItemFields.CHILD_COUNT
-				)
+				fields = ItemRepository.itemFields
 			)
 
-			response.items.orEmpty()
+			response.items
 		}
 
 		BaseItemKind.MUSIC_ALBUM -> {
@@ -136,15 +120,11 @@ class SdkPlaybackHelper(
 				),
 				recursive = true,
 				limit = ITEM_QUERY_LIMIT,
-				fields = setOf(
-					ItemFields.PRIMARY_IMAGE_ASPECT_RATIO,
-					ItemFields.GENRES,
-					ItemFields.CHILD_COUNT
-				),
+				fields = ItemRepository.itemFields,
 				albumIds = listOf(mainItem.id)
 			)
 
-			response.items.orEmpty()
+			response.items
 		}
 
 		BaseItemKind.MUSIC_ARTIST -> {
@@ -154,15 +134,11 @@ class SdkPlaybackHelper(
 				sortBy = listOf(ItemSortBy.SORT_NAME),
 				recursive = true,
 				limit = ITEM_QUERY_LIMIT,
-				fields = setOf(
-					ItemFields.PRIMARY_IMAGE_ASPECT_RATIO,
-					ItemFields.GENRES,
-					ItemFields.CHILD_COUNT
-				),
+				fields = ItemRepository.itemFields,
 				artistIds = listOf(mainItem.id)
 			)
 
-			response.items.orEmpty()
+			response.items
 		}
 
 		BaseItemKind.PLAYLIST -> {
@@ -172,17 +148,10 @@ class SdkPlaybackHelper(
 				sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else null,
 				recursive = true,
 				limit = ITEM_QUERY_LIMIT,
-				fields = setOf(
-					ItemFields.MEDIA_SOURCES,
-					ItemFields.MEDIA_STREAMS,
-					ItemFields.CHAPTERS,
-					ItemFields.PATH,
-					ItemFields.PRIMARY_IMAGE_ASPECT_RATIO,
-					ItemFields.CHILD_COUNT
-				)
+				fields = ItemRepository.itemFields
 			)
 
-			response.items.orEmpty()
+			response.items
 		}
 
 		BaseItemKind.PROGRAM -> {
@@ -237,7 +206,7 @@ class SdkPlaybackHelper(
 		val partCount = item.partCount
 		if (partCount != null && partCount > 1) {
 			val response by api.videosApi.getAdditionalPart(item.id)
-			addAll(response.items.orEmpty())
+			addAll(response.items)
 		}
 	}
 
@@ -276,15 +245,11 @@ class SdkPlaybackHelper(
 		getScope(context).launch {
 			val response by api.instantMixApi.getInstantMixFromItem(
 				itemId = item.id,
-				fields = setOf(
-					ItemFields.PRIMARY_IMAGE_ASPECT_RATIO,
-					ItemFields.GENRES,
-					ItemFields.CHILD_COUNT
-				)
+				fields = ItemRepository.itemFields
 			)
 
 			val items = response.items
-			if (!items.isNullOrEmpty()) {
+			if (items.isNotEmpty()) {
 				mediaManager.playNow(context, items, 0, false)
 			} else {
 				Toast.makeText(context, R.string.msg_no_playable_items, Toast.LENGTH_LONG).show()

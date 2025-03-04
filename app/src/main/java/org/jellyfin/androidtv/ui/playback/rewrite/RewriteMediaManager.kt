@@ -31,7 +31,6 @@ import org.jellyfin.playback.jellyfin.queue.createBaseItemQueueEntry
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.MediaType
-import kotlin.math.max
 
 @Suppress("TooManyFunctions")
 class RewriteMediaManager(
@@ -54,7 +53,7 @@ class RewriteMediaManager(
 		get() = playbackManager.state.positionInfo.active.inWholeMilliseconds
 
 	override val currentAudioQueueDisplayPosition: String
-		get() = (currentAudioQueuePosition + 1).toString()
+		get() = (playbackManager.queue.entryIndex.value + 1).toString()
 
 	override val currentAudioQueueDisplaySize: String
 		get() = playbackManager.queue.estimatedSize.toString()
@@ -136,25 +135,23 @@ class RewriteMediaManager(
 		}.launchIn(this)
 
 		playbackManager.queue.entry.onEach { updateAdapter() }.launchIn(this)
+		playbackManager.state.playbackOrder.onEach { updateAdapter() }.launchIn(this)
 	}
 
 	private fun updateAdapter() {
-		// Get all items as BaseRowItem
-		val items = queueSupplier
-			.items
-			// Map to audio queue items
-			.mapIndexed { index, item ->
-				AudioQueueBaseRowItem(item).apply {
-					playing = playbackManager.queue.entryIndex.value == index
-				}
-			}
-			// Remove items before currently playing item
-			.drop(max(0, playbackManager.queue.entryIndex.value))
+		val currentItem = playbackManager.queue.entry.value?.baseItem?.let(::AudioQueueBaseRowItem)?.apply {
+			playing = true
+		}
+		// It's safe to run this blocking as all items are prefetched via the [BaseItemQueueSupplier]
+		val upcomingItems = runBlocking { playbackManager.queue.peekNext(100) }
+			.mapIndexedNotNull { index, item -> item.baseItem?.let(::AudioQueueBaseRowItem) }
+
+		val items = listOfNotNull(currentItem) + upcomingItems
 
 		// Update item row
 		currentAudioQueue.replaceAll(
 			items,
-			areItemsTheSame = { old, new -> (old as? AudioQueueBaseRowItem)?.baseItem == (new as? AudioQueueBaseRowItem)?.baseItem },
+			areItemsTheSame = { old, new -> (old as? AudioQueueBaseRowItem)?.baseItem?.id == (new as? AudioQueueBaseRowItem)?.baseItem?.id },
 			// The equals functions for BaseRowItem only compare by id
 			areContentsTheSame = { _, _ -> false },
 		)
@@ -188,12 +185,7 @@ class RewriteMediaManager(
 	override fun addToAudioQueue(items: List<BaseItemDto>) {
 		if (items.isEmpty()) return
 
-		val addIndex = when (playbackManager.state.playState.value) {
-			PlayState.PLAYING -> playbackManager.queue.entryIndex.value + 1
-			else -> 0
-		}
-
-		queueSupplier.items.addAll(addIndex, items)
+		queueSupplier.items.addAll(items)
 
 		if (playbackManager.state.playState.value != PlayState.PLAYING) {
 			playbackManager.state.setPlaybackOrder(if (isShuffleMode) PlaybackOrder.SHUFFLE else PlaybackOrder.DEFAULT)
@@ -274,7 +266,7 @@ class RewriteMediaManager(
 
 	override fun togglePlayPause() {
 		val playState = playbackManager.state.playState.value
-		if (playState == PlayState.PAUSED) playbackManager.state.unpause()
+		if (playState == PlayState.PAUSED || playState == PlayState.STOPPED) playbackManager.state.unpause()
 		else if (playState == PlayState.PLAYING) playbackManager.state.pause()
 	}
 

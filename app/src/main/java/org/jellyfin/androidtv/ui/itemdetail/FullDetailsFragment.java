@@ -77,7 +77,7 @@ import org.jellyfin.androidtv.util.PlaybackHelper;
 import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.BaseItemUtils;
-import org.jellyfin.androidtv.util.apiclient.LifecycleAwareResponse;
+import org.jellyfin.androidtv.util.apiclient.Response;
 import org.jellyfin.androidtv.util.sdk.BaseItemExtensionsKt;
 import org.jellyfin.androidtv.util.sdk.TrailerUtils;
 import org.jellyfin.androidtv.util.sdk.compat.JavaCompat;
@@ -678,7 +678,21 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
     private String getRunTime() {
         Long runtime = Utils.getSafeValue(mBaseItem.getRunTimeTicks(), mBaseItem.getRunTimeTicks());
-        return runtime != null && runtime > 0 ? String.format("%d%s", (int) Math.ceil((double) runtime / 600000000), getString(R.string.lbl_min)) : "";
+
+        if (runtime == null || runtime <= 0) {
+            return "";
+        }
+
+        int totalMinutes = (int) Math.ceil((double) runtime / 600000000);
+
+        int hours = totalMinutes / 60;
+        int minutes = totalMinutes % 60;
+
+        if (hours > 0) {
+            return getString(R.string.runtime_hours_minutes, hours, minutes);
+        }
+
+        return getString(R.string.runtime_minutes, minutes);
     }
 
     private String getEndTime() {
@@ -700,16 +714,14 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
         BaseItemDto baseItem = mBaseItem;
         if (baseItem.getType() == BaseItemKind.AUDIO || baseItem.getType() == BaseItemKind.MUSIC_ALBUM || baseItem.getType() == BaseItemKind.MUSIC_ARTIST) {
             if (baseItem.getType() == BaseItemKind.MUSIC_ALBUM || baseItem.getType() == BaseItemKind.MUSIC_ARTIST) {
-                playbackHelper.getValue().getItemsToPlay(getContext(), baseItem, false, false, new LifecycleAwareResponse<List<BaseItemDto>>(getLifecycle()) {
+                playbackHelper.getValue().getItemsToPlay(getContext(), baseItem, false, false, new Response<List<BaseItemDto>>() {
                     @Override
                     public void onResponse(List<BaseItemDto> response) {
-                        if (!getActive()) return;
-
                         mediaManager.getValue().addToAudioQueue(response);
                     }
                 });
             } else {
-                mediaManager.getValue().addToAudioQueue(Arrays.asList(baseItem));
+                mediaManager.getValue().queueAudioItem(baseItem);
             }
         }
     }
@@ -1182,10 +1194,9 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     }
 
     void play(final BaseItemDto item, final int pos, final boolean shuffle) {
-        playbackHelper.getValue().getItemsToPlay(getContext(), item, pos == 0 && item.getType() == BaseItemKind.MOVIE, shuffle, new LifecycleAwareResponse<List<BaseItemDto>>(getLifecycle()) {
+        playbackHelper.getValue().getItemsToPlay(getContext(), item, pos == 0 && item.getType() == BaseItemKind.MOVIE, shuffle, new Response<List<BaseItemDto>>() {
             @Override
             public void onResponse(List<BaseItemDto> response) {
-                if (!getActive()) return;
                 if (response.isEmpty()) {
                     Timber.e("No items to play - ignoring play request.");
                     return;

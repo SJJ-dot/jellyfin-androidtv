@@ -42,6 +42,7 @@ import org.jellyfin.androidtv.util.ImageHelper;
 import org.jellyfin.androidtv.util.KeyProcessor;
 import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
+import org.jellyfin.playback.core.PlaybackManager;
 
 import java.util.List;
 
@@ -84,6 +85,7 @@ public class AudioNowPlayingFragment extends Fragment {
 
     private final Lazy<BackgroundService> backgroundService = inject(BackgroundService.class);
     private final Lazy<MediaManager> mediaManager = inject(MediaManager.class);
+    private final Lazy<PlaybackManager> playbackManager = inject(PlaybackManager.class);
     private final Lazy<NavigationRepository> navigationRepository = inject(NavigationRepository.class);
     private final Lazy<KeyProcessor> keyProcessor = inject(KeyProcessor.class);
     private final Lazy<ImageHelper> imageHelper = inject(ImageHelper.class);
@@ -107,6 +109,7 @@ public class AudioNowPlayingFragment extends Fragment {
         mCurrentNdx = binding.track;
         mScrollView = binding.mainScroller;
         mCounter = binding.counter;
+        AudioNowPlayingFragmentHelperKt.initializeLyricsView(binding.poster, binding.lyrics, playbackManager.getValue());
 
         mPlayPauseButton = binding.playPauseBtn;
         mPlayPauseButton.setContentDescription(getString(R.string.lbl_pause));
@@ -253,14 +256,9 @@ public class AudioNowPlayingFragment extends Fragment {
         @Override
         public void onQueueStatusChanged(boolean hasQueue) {
             Timber.d("Queue status changed (hasQueue=%s)", hasQueue);
-            if (hasQueue) {
-                loadItem();
-                if (mediaManager.getValue().isAudioPlayerInitialized()) {
-                    updateButtons();
-                }
-            } else {
-                if (navigationRepository.getValue().getCanGoBack()) navigationRepository.getValue().goBack();
-                else navigationRepository.getValue().reset(Destinations.INSTANCE.getHome());
+            loadItem();
+            if (mediaManager.getValue().isAudioPlayerInitialized()) {
+                updateButtons();
             }
         }
 
@@ -305,6 +303,9 @@ public class AudioNowPlayingFragment extends Fragment {
         if (mBaseItem != null) {
             updatePoster();
             updateInfo(mBaseItem);
+        } else {
+            if (navigationRepository.getValue().getCanGoBack()) navigationRepository.getValue().goBack();
+            else navigationRepository.getValue().navigate(Destinations.INSTANCE.getHome());
         }
     }
 

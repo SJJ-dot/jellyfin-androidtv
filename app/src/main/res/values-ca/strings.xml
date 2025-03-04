@@ -31,7 +31,6 @@
     <string name="lbl_settings">Preferències</string>
     <string name="chapters">Capítols</string>
     <string name="lbl_play_all">Reproduïr tots</string>
-    <string name="lbl_min">" min"</string>
     <string name="lbl_yes">Sí</string>
     <string name="lbl_no">No</string>
     <string name="lbl_play_trailers">Reprodueix tràiler(s)</string>
@@ -41,9 +40,9 @@
     <string name="lbl_none">Cap</string>
     <string name="lbl_recordings">Gravacions</string>
     <string name="lbl_videos">Vídeos</string>
-    <string name="lbl_people">Gent</string>
+    <string name="lbl_people">Persones</string>
     <string name="lbl_other_options">Altres opcions</string>
-    <string name="lbl_last_played">"Última reproducció "</string>
+    <string name="lbl_last_played">"Últimes reproduccions "</string>
     <string name="lbl_directed_by">Dirigit per</string>
     <string name="lbl_ends">Finalitza</string>
     <string name="lbl_runs">Reproduccions</string>
@@ -559,11 +558,22 @@
     <string name="lbl_subtitle_text_color">Color de text dels subtítols</string>
     <string name="lbl_subtitle_background_color">Color de fons dels subtítols</string>
     <string name="lbl_subtitle_text_stroke_color">Color de traç dels subtítols</string>
-    <string name="pref_subtitles_size_very_small">Molt petit</string>
-    <string name="pref_subtitles_size_small">Petit</string>
-    <string name="pref_subtitles_size_normal">Normal</string>
-    <string name="pref_subtitles_size_large">Gran</string>
-    <string name="pref_subtitles_size_very_large">Molt gran</string>
     <string name="prefer_exoplayer_ffmpeg">Preferir FFmpeg per reproducció d\'àudio</string>
     <string name="prefer_exoplayer_ffmpeg_content">Utilitzar FFmpeg per a descodificar l\'àudio, encara que els còdecs de plataforma estiguin disponibles.</string>
+    <string name="default_video_zoom">Configuració de zoom predeterminat</string>
+    <string name="segment_action_skip">Salta</string>
+    <string name="segment_type_intro">Introduccions</string>
+    <string name="segment_type_preview">Previsualitzacions</string>
+    <string name="segment_type_recap">Recapitulacions</string>
+    <string name="segment_type_unknown">Segments desconeguts</string>
+    <string name="segment_action_nothing">No facis res</string>
+    <string name="video_start_delay">Retard de l\'inici del vídeo</string>
+    <string name="runtime_hours_minutes">%1$dh %2$dm</string>
+    <string name="runtime_minutes">%1$dm</string>
+    <string name="segment_action_ask_to_skip">Demanar per saltar</string>
+    <string name="segment_type_commercial">Publicitat</string>
+    <string name="segment_type_outro">Crèdits</string>
+    <string name="preference_enable_trickplay">Habilitar previsualitzacions al reproductor</string>
+    <string name="skip_forward_length">Longitud de salt cap endavant</string>
+    <string name="pref_mediasegment_actions">Accions de segment de mitjans</string>
 </resources>

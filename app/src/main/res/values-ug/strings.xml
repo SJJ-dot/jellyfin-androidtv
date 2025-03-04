@@ -64,7 +64,6 @@
     <string name="lbl_watched">كۆرگەنلىرىم</string>
     <string name="lbl_sd">نورمال</string>
     <string name="lbl_runs">ۋاقتى</string>
-    <string name="lbl_min">" مىنۇت"</string>
     <string name="lbl_ends">ئاخىرلاشتۇرۇش</string>
     <string name="lbl_directed_by">رېژىسسور</string>
     <string name="lbl_last_played">"ئالدىنقى قېتىم قويۇلغىنى "</string>
@@ -127,4 +126,14 @@
     <string name="color_white">ئاق</string>
     <string name="color_darkgrey">قېنىق كۈل رەڭ</string>
     <string name="color_pink">ھالرەڭ</string>
+    <string name="continue_listening">داۋاملىق ئاڭلاڭ</string>
+    <string name="lbl_latest_in">يېقىندا %1$s قوشۇلدى</string>
+    <string name="live_tv_preferences">نەق مەيدان تېلېۋىزىيە تاللانمىلىرى</string>
+    <string name="pref_telemetry_description">ھادىسە دوكلاتىنى ئەۋەتىڭ ، خاتىرىلەرنى ئۆز ئىچىگە ئالىدۇ</string>
+    <string name="pref_telemetry_category">ھادىسە دوكلاتى</string>
+    <string name="lbl_home">باش بەت</string>
+    <string name="because_you_watched">چۈنكى سىز %1$s نى كۆردىڭىز</string>
+    <string name="action_connect">ئۇلاڭ</string>
+    <string name="server_unsupported_notification">بۇ مۇلازىمېتىر قوللىمايدىغان Jellyfin نەشىرىنى%2$s ئىشلىتىدۇ. بۇ دېتالنى داۋاملىق ئىشلىتىش ئۈچۈن Jellyfin %1$s ياكى يېڭى نەشرىگە يېڭىلاڭ.</string>
+    <string name="app_notification_uimode_invalid">بۇ ئەپ تېلېۋىزور ئۈچۈن ئەلالاشتۇرۇلغان. كۆچمە ئەپنى باشقا ئۈسكۈنىلەردە ئىشلىتىشنى تەۋسىيە قىلىمىز.</string>
 </resources>

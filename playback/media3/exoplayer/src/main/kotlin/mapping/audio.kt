@@ -5,19 +5,19 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 
 @OptIn(UnstableApi::class)
-fun getFfmpegAudioMimeType(codec: String): String {
-	return ffmpegAudioMimeTypes[codec]
+fun getFfmpegAudioMimeType(codec: String, fallback: String = codec) = codec.lowercase().let { codec ->
+	ffmpegAudioMimeTypes[codec]
 		?: MimeTypes.getAudioMediaMimeType(codec)
-		?: codec
+		?: fallback
 }
 
 val ffmpegAudioMimeTypes = mapOf(
 	"aac" to MimeTypes.AUDIO_AAC,
 	"ac3" to MimeTypes.AUDIO_AC3,
 	"alac" to MimeTypes.AUDIO_ALAC,
-	"amrnb" to MimeTypes.AUDIO_AMR_NB,
-	"amrwb" to MimeTypes.AUDIO_AMR_WB,
-	"dca" to MimeTypes.AUDIO_DTS,
+	"amr_nb" to MimeTypes.AUDIO_AMR_NB,
+	"amr_wb" to MimeTypes.AUDIO_AMR_WB,
+	"dts" to MimeTypes.AUDIO_DTS,
 	"eac3" to MimeTypes.AUDIO_E_AC3,
 	"flac" to MimeTypes.AUDIO_FLAC,
 	"mp1" to MimeTypes.AUDIO_MPEG_L1,

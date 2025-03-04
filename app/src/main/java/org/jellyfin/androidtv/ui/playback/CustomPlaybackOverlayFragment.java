@@ -71,7 +71,7 @@ import org.jellyfin.androidtv.util.InfoLayoutHelper;
 import org.jellyfin.androidtv.util.TextUtilsKt;
 import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
-import org.jellyfin.androidtv.util.apiclient.EmptyLifecycleAwareResponse;
+import org.jellyfin.androidtv.util.apiclient.EmptyResponse;
 import org.jellyfin.androidtv.util.sdk.BaseItemExtensionsKt;
 import org.jellyfin.sdk.model.api.BaseItemDto;
 import org.jellyfin.sdk.model.api.BaseItemKind;
@@ -86,7 +86,7 @@ import kotlin.Lazy;
 import timber.log.Timber;
 
 public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGuide, View.OnKeyListener {
-    private VlcPlayerInterfaceBinding binding;
+    protected VlcPlayerInterfaceBinding binding;
     private OverlayTvGuideBinding tvGuideBinding;
 
     private RowsSupportFragment mPopupRowsFragment;
@@ -123,8 +123,9 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     private boolean mFadeEnabled = false;
     private boolean mIsVisible = false;
     private boolean mPopupPanelVisible = false;
+    private boolean navigating = false;
 
-    private LeanbackOverlayFragment leanbackOverlayFragment;
+    protected LeanbackOverlayFragment leanbackOverlayFragment;
 
     private final Lazy<org.jellyfin.sdk.api.client.ApiClient> api = inject(org.jellyfin.sdk.api.client.ApiClient.class);
     private final Lazy<MediaManager> mediaManager = inject(MediaManager.class);
@@ -154,11 +155,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         requireActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         mItemsToPlay = videoQueueManager.getValue().getCurrentVideoQueue();
-        if (mItemsToPlay == null || mItemsToPlay.size() == 0) {
-            Utils.showToast(requireContext(), getString(R.string.msg_no_playable_items));
-            closePlayer();
-            return;
-        }
+        if (mItemsToPlay == null || mItemsToPlay.isEmpty()) return;
 
         int mediaPosition = videoQueueManager.getValue().getCurrentMediaPosition();
 
@@ -167,7 +164,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         // setup fade task
         mHideTask = () -> {
             if (mIsVisible) {
-                hide();
                 leanbackOverlayFragment.hideOverlay();
             }
         };
@@ -202,9 +198,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         tvGuideBinding.getRoot().setVisibility(View.GONE);
 
         binding.getRoot().setOnTouchListener((v, event) -> {
-            //if we're not visible, show us
-            if (!mIsVisible) show();
-
             //and then manage our fade timer
             if (mFadeEnabled) startFadeTimer();
 
@@ -218,6 +211,12 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (mItemsToPlay == null || mItemsToPlay.isEmpty()) {
+            Utils.showToast(requireContext(), getString(R.string.msg_no_playable_items));
+            closePlayer();
+            return;
+        }
 
         if (playbackControllerContainer.getValue().getPlaybackController() != null) {
             playbackControllerContainer.getValue().getPlaybackController().init(new VideoManager((requireActivity()), view, helper), this);
@@ -236,7 +235,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (mItemsToPlay == null || mItemsToPlay.size() == 0) return;
+        if (mItemsToPlay == null || mItemsToPlay.isEmpty()) return;
 
         prepareOverlayFragment();
 
@@ -298,6 +297,8 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         playbackControllerContainer.getValue().getPlaybackController().play(startPos);
         leanbackOverlayFragment.updatePlayState();
 
+        // Set initial skip overlay state
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     @Override
@@ -475,6 +476,22 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                     leanbackOverlayFragment.hideOverlay();
                 }
 
+                if (binding.skipOverlay.getVisible()) {
+                    // Hide without doing anything
+                    if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_ESCAPE) {
+                        binding.skipOverlay.setTargetPositionMs(null);
+                        return true;
+                    }
+
+                    // Hide with seek
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
+                        playbackControllerContainer.getValue().getPlaybackController().seek(binding.skipOverlay.getTargetPositionMs(), true);
+                        leanbackOverlayFragment.setShouldShowOverlay(false);
+                        if (binding != null) binding.skipOverlay.setTargetPositionMs(null);
+                        return true;
+                    }
+                }
+
                 if (keyCode == KeyEvent.KEYCODE_MEDIA_STOP) {
                     closePlayer();
                     return true;
@@ -583,9 +600,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                             playbackControllerContainer.getValue().getPlaybackController().playPause();
                             return true;
                         }
-
-                        //if we're not visible, show us
-                        show();
                     }
 
                     //and then manage our fade timer
@@ -642,11 +656,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         // Close player when resuming without a valid playback controller
         PlaybackController playbackController = playbackControllerContainer.getValue().getPlaybackController();
         if (playbackController == null || !playbackController.hasFragment()) {
-            if (navigationRepository.getValue().getCanGoBack()) {
-                navigationRepository.getValue().goBack();
-            } else {
-                navigationRepository.getValue().reset(Destinations.INSTANCE.getHome());
-            }
+            closePlayer();
 
             return;
         }
@@ -665,6 +675,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     @Override
     public void onPause() {
         super.onPause();
+        if (mItemsToPlay == null || mItemsToPlay.isEmpty()) return;
 
         setPlayPauseActionState(0);
 
@@ -686,27 +697,39 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             Timber.d("this fragment belongs to the current session, ending it");
             playbackControllerContainer.getValue().getPlaybackController().endPlayback();
         }
+
+        closePlayer();
     }
 
     public void show() {
+        // Already showing!
+        if (mIsVisible) return;
+
         binding.topPanel.startAnimation(slideDown);
         mIsVisible = true;
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     public void hide() {
+        // Can't hide what's already hidden
+        if (!mIsVisible) return;
+
         mIsVisible = false;
         binding.topPanel.startAnimation(fadeOut);
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     private void showChapterPanel() {
         setFadingEnabled(false);
         binding.popupArea.startAnimation(showPopup);
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     private void hidePopupPanel() {
         startFadeTimer();
         binding.popupArea.startAnimation(hidePopup);
         mPopupPanelVisible = false;
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     public void showGuide() {
@@ -727,12 +750,14 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         if (needLoad) {
             loadGuide();
         }
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     private void hideGuide() {
         tvGuideBinding.getRoot().setVisibility(View.GONE);
         playbackControllerContainer.getValue().getPlaybackController().mVideoManager.setVideoFullSize(true);
         mGuideVisible = false;
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     private void loadGuide() {
@@ -771,17 +796,16 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         tvGuideBinding.channelsStatus.setText("");
         tvGuideBinding.filterStatus.setText("");
         final CustomPlaybackOverlayFragment self = this;
-        TvManager.getProgramsAsync(this, mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx, mCurrentGuideStart, mCurrentGuideEnd, new EmptyLifecycleAwareResponse(getLifecycle()) {
+        TvManager.getProgramsAsync(this, mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx, mCurrentGuideStart, mCurrentGuideEnd, new EmptyResponse() {
             @Override
             public void onResponse() {
-                if (!getActive()) return;
-
                 Timber.d("*** Programs response");
                 if (mDisplayProgramsTask != null) mDisplayProgramsTask.cancel(true);
                 mDisplayProgramsTask = new DisplayProgramsTask(self);
                 mDisplayProgramsTask.execute(mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx);
             }
         });
+        binding.skipOverlay.setSkipUiEnabled(!mIsVisible && !mGuideVisible && !mPopupPanelVisible);
     }
 
     DisplayProgramsTask mDisplayProgramsTask;
@@ -1051,11 +1075,9 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     public void showProgramOptions() {
         if (mSelectedProgram == null) return;
         if (mDetailPopup == null)
-            mDetailPopup = new LiveProgramDetailPopup(requireActivity(), this, this, Utils.convertDpToPixel(requireContext(), 600), new EmptyLifecycleAwareResponse(getLifecycle()) {
+            mDetailPopup = new LiveProgramDetailPopup(requireActivity(), this, this, Utils.convertDpToPixel(requireContext(), 600), new EmptyResponse() {
                 @Override
                 public void onResponse() {
-                    if (!getActive()) return;
-
                     switchChannel(mSelectedProgram.getChannelId());
                 }
             });
@@ -1179,6 +1201,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     }
 
     public void setCurrentTime(long time) {
+        binding.skipOverlay.setCurrentPositionMs(time);
         if (leanbackOverlayFragment != null)
             leanbackOverlayFragment.updateCurrentPosition();
     }
@@ -1188,7 +1211,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
 
     public void setFadingEnabled(boolean value) {
         mFadeEnabled = value;
-        if (!mIsVisible) requireActivity().runOnUiThread(this::show);
         if (mFadeEnabled) {
             startFadeTimer();
         } else {
@@ -1265,6 +1287,9 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     }
 
     public void closePlayer() {
+        if (navigating) return;
+        navigating = true;
+
         if (navigationRepository.getValue().getCanGoBack()) {
             navigationRepository.getValue().goBack();
         } else {
@@ -1273,6 +1298,9 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     }
 
     public void showNextUp(@NonNull UUID id) {
+        if (navigating) return;
+        navigating = true;
+
         navigationRepository.getValue().navigate(Destinations.INSTANCE.nextUp(id), true);
     }
 

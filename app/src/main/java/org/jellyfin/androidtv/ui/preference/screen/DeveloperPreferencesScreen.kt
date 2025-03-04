@@ -1,8 +1,7 @@
 package org.jellyfin.androidtv.ui.preference.screen
 
 import android.text.format.Formatter
-import coil.ImageLoader
-import coil.annotation.ExperimentalCoilApi
+import coil3.ImageLoader
 import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.SystemPreferences
@@ -51,13 +50,19 @@ class DeveloperPreferencesScreen : OptionsFragment() {
 			}
 
 			checkbox {
+				setTitle(R.string.preference_enable_trickplay)
+				setContent(R.string.enable_playback_module_description)
+
+				bind(userPreferences, UserPreferences.trickPlayEnabled)
+			}
+
+			checkbox {
 				setTitle(R.string.prefer_exoplayer_ffmpeg)
 				setContent(R.string.prefer_exoplayer_ffmpeg_content)
 
 				bind(userPreferences, UserPreferences.preferExoPlayerFfmpeg)
 			}
 
-			@OptIn(ExperimentalCoilApi::class)
 			action {
 				setTitle(R.string.clear_image_cache)
 				content = getString(R.string.clear_image_cache_content, Formatter.formatFileSize(context, imageLoader.diskCache?.size ?: 0))

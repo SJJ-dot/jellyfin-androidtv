@@ -8,14 +8,17 @@ import android.widget.Toast
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.playback.PlaybackController
 import org.jellyfin.androidtv.ui.playback.overlay.CustomPlaybackTransportControlGlue
-import org.jellyfin.androidtv.ui.playback.overlay.LeanbackOverlayFragment
 import org.jellyfin.androidtv.ui.playback.overlay.VideoPlayerAdapter
+import org.jellyfin.androidtv.ui.playback.setSubtitleIndex
+import org.jellyfin.sdk.model.api.MediaStreamType
 import timber.log.Timber
 
 class ClosedCaptionsAction(
 	context: Context,
 	customPlaybackTransportControlGlue: CustomPlaybackTransportControlGlue,
 ) : CustomAction(context, customPlaybackTransportControlGlue) {
+	private var popup: PopupMenu? = null
+
 	init {
 		initializeWithIcon(R.drawable.ic_select_subtitle)
 	}
@@ -33,25 +36,37 @@ class ClosedCaptionsAction(
 		}
 
 		videoPlayerAdapter.leanbackOverlayFragment.setFading(false)
-		PopupMenu(context, view, Gravity.END).apply {
+		removePopup()
+		popup = PopupMenu(context, view, Gravity.END).apply {
 			with(menu) {
-				for (sub in playbackController.subtitleStreams) {
-					add(0, sub.index, sub.index, sub.displayTitle).apply {
+				var order = 0
+				add(0, -1, order++, context.getString(R.string.lbl_none)).apply {
+					isChecked = playbackController.subtitleStreamIndex == -1
+				}
+
+				for (sub in playbackController.currentMediaSource.mediaStreams.orEmpty()) {
+					if (sub.type != MediaStreamType.SUBTITLE) continue
+
+					add(0, sub.index, order++, sub.displayTitle).apply {
 						isChecked = sub.index == playbackController.subtitleStreamIndex
 					}
 				}
 
-				add(0, -1, 0, context.getString(R.string.lbl_none)).apply {
-					isChecked = playbackController.subtitleStreamIndex == -1
-				}
-
 				setGroupCheckable(0, true, false)
 			}
-			setOnDismissListener { videoPlayerAdapter.leanbackOverlayFragment.setFading(true) }
+			setOnDismissListener {
+				videoPlayerAdapter.leanbackOverlayFragment.setFading(true)
+				popup = null
+			}
 			setOnMenuItemClickListener { item ->
-				playbackController.switchSubtitleStream(item.itemId)
+				playbackController.setSubtitleIndex(item.itemId)
 				true
 			}
-		}.show()
+		}
+		popup?.show()
+	}
+
+	fun removePopup() {
+		popup?.dismiss()
 	}
 }

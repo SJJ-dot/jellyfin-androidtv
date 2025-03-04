@@ -43,7 +43,6 @@
     <string name="lbl_upcoming">Por Estrenar</string>
     <string name="lbl_sd">SD</string>
     <string name="lbl_runs">Duración</string>
-    <string name="lbl_min">" min"</string>
     <string name="lbl_ends">Termina</string>
     <string name="lbl_directed_by">Dirigido Por</string>
     <string name="lbl_last_played">"Ultimos vistos "</string>
@@ -73,7 +72,7 @@
     <string name="lbl_showing">Demostración</string>
     <string name="desc_debug">Proporcione información adicional para la depuración</string>
     <string name="lbl_enable_debug">Opciones de depuración</string>
-    <string name="lbl_goto_series">Ir a series</string>
+    <string name="lbl_goto_series">Ir a la serie</string>
     <string name="lbl_audio_output">Salida de audio</string>
     <string name="pref_audio_compat">Remezclar a estéreo</string>
     <string name="pref_audio_direct">Directo</string>
@@ -556,4 +555,23 @@
     <string name="continue_listening">Continuar escuchando</string>
     <string name="scheduled_in_next_24_hours">Programado en las próximas 24 horas</string>
     <string name="past_24_hours">Últimas 24 horas</string>
+    <string name="video_start_delay">Retraso en el inicio del video</string>
+    <string name="lbl_subtitle_background_color">Color del fondo de los subtítulos</string>
+    <string name="lbl_subtitle_text_stroke_color">Color de contorno de los subtítulos</string>
+    <string name="segment_action_nothing">No hacer nada</string>
+    <string name="segment_action_skip">Saltar</string>
+    <string name="segment_type_commercial">Publicidad</string>
+    <string name="segment_type_intro">Intros</string>
+    <string name="segment_type_preview">Adelantos</string>
+    <string name="segment_type_recap">Resumen</string>
+    <string name="pref_mediasegment_actions">Acciones de segmentos de medios</string>
+    <string name="segment_type_unknown">Segmentos desconocidos</string>
+    <string name="lbl_subtitle_text_color">Color del texto de los subtítulos</string>
+    <string name="prefer_exoplayer_ffmpeg">Preferir FFmpeg para reproducir audio</string>
+    <string name="prefer_exoplayer_ffmpeg_content">Usa FFmpeg para decodificar el audio, incluso si los códecs de la plataforma están disponibles.</string>
+    <string name="segment_type_outro">Créditos</string>
+    <string name="default_video_zoom">Modo de ampliación por defecto</string>
+    <string name="segment_action_ask_to_skip">Preguntar para saltar</string>
+    <string name="preference_enable_trickplay">Habilitar previsualizaciones en el reproductor</string>
+    <string name="skip_forward_length">Longitud de salto hacia adelante</string>
 </resources>

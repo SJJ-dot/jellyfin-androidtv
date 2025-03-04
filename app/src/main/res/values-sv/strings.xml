@@ -170,7 +170,6 @@
     <string name="lbl_last_played">"Senast sedd "</string>
     <string name="lbl_directed_by">Regisserad av</string>
     <string name="lbl_ends">Slutar</string>
-    <string name="lbl_min">" min"</string>
     <string name="lbl_runs">Speltid</string>
     <string name="lbl_sd">SD</string>
     <string name="lbl_watched">Sett</string>
@@ -548,10 +547,23 @@
     <string name="current_queue">Aktuell kö</string>
     <string name="lbl_subtitle_text_color">Textfärg för undertexter</string>
     <string name="lbl_subtitle_background_color">Bakgrundsfärg för undertexter</string>
-    <string name="pref_subtitles_size_normal">Normal</string>
-    <string name="pref_subtitles_size_large">Stor</string>
-    <string name="pref_subtitles_size_very_large">Mycket stor</string>
     <string name="lbl_subtitle_text_stroke_color">Färg för undertextens kantlinje</string>
-    <string name="pref_subtitles_size_small">Liten</string>
-    <string name="pref_subtitles_size_very_small">Mycket liten</string>
+    <string name="prefer_exoplayer_ffmpeg">Föredra FFmpeg för ljuduppspelning</string>
+    <string name="prefer_exoplayer_ffmpeg_content">Använd FFmpeg för att avkoda ljud, även om det finns tillgängliga plattformscodecs.</string>
+    <string name="segment_type_outro">Outros</string>
+    <string name="preference_enable_trickplay">Aktivera trickplay i videospelaren</string>
+    <string name="default_video_zoom">Standard zoomläge</string>
+    <string name="video_start_delay">Fördröjning av videostart</string>
+    <string name="segment_type_preview">Förhandsvisningar</string>
+    <string name="segment_type_recap">Sammanfattningar</string>
+    <string name="segment_type_unknown">Okända segment</string>
+    <string name="segment_action_ask_to_skip">Fråga om att hoppa över</string>
+    <string name="segment_type_intro">Intros</string>
+    <string name="skip_forward_length">Hoppa framåt i längd</string>
+    <string name="pref_mediasegment_actions">Åtgärder inom mediesegmentet</string>
+    <string name="segment_action_nothing">Gör inget</string>
+    <string name="segment_action_skip">Hoppa över</string>
+    <string name="segment_type_commercial">Reklamfilmer</string>
+    <string name="runtime_hours_minutes">%1$dt %2$dm</string>
+    <string name="runtime_minutes">%1$dm</string>
 </resources>

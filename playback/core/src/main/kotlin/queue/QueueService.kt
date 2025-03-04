@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.jellyfin.playback.core.PlaybackManager
+import org.jellyfin.playback.core.backend.PlayerBackendEventListener
+import org.jellyfin.playback.core.mediastream.PlayableMediaStream
+import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PlaybackOrder
 import org.jellyfin.playback.core.model.RepeatMode
 import org.jellyfin.playback.core.plugin.PlayerService
@@ -44,6 +47,18 @@ class QueueService internal constructor() : PlayerService(), Queue {
 				PlaybackOrder.SHUFFLE -> ShuffleOrderIndexProvider()
 			}
 		}.launchIn(coroutineScope)
+
+		// Automatically advance when current stream ends
+		manager.backendService.addListener(object : PlayerBackendEventListener {
+			override fun onPlayStateChange(state: PlayState) = Unit
+			override fun onVideoSizeChange(width: Int, height: Int) = Unit
+			override fun onMediaStreamEnd(mediaStream: PlayableMediaStream) {
+				coroutineScope.launch {
+					val nextItem = next(usePlaybackOrder = true, useRepeatMode = true)
+					if (nextItem == null && _entryIndex.value != Queue.INDEX_NONE) setIndex(Queue.INDEX_NONE, true)
+				}
+			}
+		})
 	}
 
 	// Entry management
@@ -77,7 +92,7 @@ class QueueService internal constructor() : PlayerService(), Queue {
 		}
 
 		// Return item or null if not found
-		return if (index < fetchedItems.size) fetchedItems[index]
+		return if (index >= 0 && index < fetchedItems.size) fetchedItems[index]
 		else null
 	}
 
@@ -98,14 +113,14 @@ class QueueService internal constructor() : PlayerService(), Queue {
 		val repeatMode = if (useRepeatMode) state.repeatMode.value else RepeatMode.NONE
 
 		return when (repeatMode) {
-			RepeatMode.NONE -> provider.provideIndices(amount, estimatedSize, currentQueueIndicesPlayed, entryIndex.value)
+			RepeatMode.NONE -> provider.provideIndices(amount, estimatedSize, currentQueueIndicesPlayed, _entryIndex.value)
 
-			RepeatMode.REPEAT_ENTRY_ONCE -> buildList {
-				add(entryIndex.value)
-				addAll(provider.provideIndices(amount, estimatedSize, currentQueueIndicesPlayed, entryIndex.value))
+			RepeatMode.REPEAT_ENTRY_ONCE -> buildList(amount) {
+				add(_entryIndex.value)
+				addAll(provider.provideIndices(amount - 1, estimatedSize, currentQueueIndicesPlayed, _entryIndex.value))
 			}.take(amount)
 
-			RepeatMode.REPEAT_ENTRY_INFINITE -> List(amount) { entryIndex.value }
+			RepeatMode.REPEAT_ENTRY_INFINITE -> List(amount) { _entryIndex.value }
 		}
 	}
 
@@ -117,20 +132,22 @@ class QueueService internal constructor() : PlayerService(), Queue {
 
 	override suspend fun next(usePlaybackOrder: Boolean, useRepeatMode: Boolean): QueueEntry? {
 		val index = getNextIndices(1, usePlaybackOrder, useRepeatMode).firstOrNull() ?: return null
-		if (usePlaybackOrder) {
-			// Automatically set repeat mode back to none when using the ONCE option
-			if (state.repeatMode.value == RepeatMode.REPEAT_ENTRY_ONCE && index == this._entryIndex.value) {
-				state.setRepeatMode(RepeatMode.NONE)
-			} else if (state.repeatMode.value == RepeatMode.NONE) {
-				orderIndexProvider.useNextIndex()
-			}
+
+		val provider = if (usePlaybackOrder) orderIndexProvider else defaultOrderIndexProvider
+		val repeatMode = if (useRepeatMode) state.repeatMode.value else RepeatMode.NONE
+
+		// Automatically set repeat mode back to none when using the ONCE option
+		if (repeatMode == RepeatMode.REPEAT_ENTRY_ONCE && index == this._entryIndex.value) {
+			state.setRepeatMode(RepeatMode.NONE)
+		} else if (repeatMode == RepeatMode.NONE) {
+			provider.useNextIndex()
 		}
 
 		return setIndex(index, true)
 	}
 
 	override suspend fun setIndex(index: Int, saveHistory: Boolean): QueueEntry? {
-		if (index < 0) return null
+		if (index < 0 && index != Queue.INDEX_NONE) return null
 
 		// Save previous index
 		if (saveHistory && _entryIndex.value != Queue.INDEX_NONE) {

@@ -11,4 +11,23 @@
     <string name="btn_cancel">ರದ್ದುಮಾಡು</string>
     <string name="loading">ಲೋಡ್ ಆಗುತ್ತಿದೆ…</string>
     <string name="video_error_unknown_error">ವೀಡಿಯೊ ಲೋಡ್ ವಿಫಲವಾಯಿತು</string>
+    <string name="continue_listening">ಕೇಳುವುದನ್ನು ಮುಂದುವರಿಸಿ</string>
+    <string name="lbl_continue_watching">ನೋಡುವುದನ್ನು ಮುಂದುವರಿಸಿ</string>
+    <string name="lbl_home">ಮನೆ</string>
+    <string name="lbl_genres">ಶೈಲಿ</string>
+    <string name="lbl_search">ಹುಡುಕು</string>
+    <string name="lbl_next_up">ಮುಂದೆ</string>
+    <string name="lbl_views">ವೀಕ್ಷಣೆಗಳು</string>
+    <string name="lbl_by_letter">ಅಕ್ಷರದ ಮೂಲಕ</string>
+    <string name="lbl_on_now">ಈಗ</string>
+    <string name="lbl_suggested">ಸಲಹೆ</string>
+    <string name="lbl_favorites">ಮೆಚಿಡು</string>
+    <string name="lbl_coming_up">ಮುಂದೆ ಬರಲಿದೆ</string>
+    <string name="msg_not_implemented">" ಅನುಷ್ಠಾನಗೊಂಡಿಲ್ಲ"</string>
+    <string name="lbl_latest">ಇತ್ತೀಚೆಗೆ ಸೇರಿಸಲಾಗಿದೆ</string>
+    <string name="lbl_movies">ಚಲನಚಿತ್ರಗಳು</string>
+    <string name="lbl_collections">ಸಂಗ್ರಹ</string>
+    <string name="lbl_status">%1$s / %2$s</string>
+    <string name="lbl_latest_in">%1$s ನಲ್ಲಿ ಇತ್ತೀಚೆಗೆ ಸೇರಿಸಲಾಗಿದೆ</string>
+    <string name="lbl_by_name">ಹೆಸರಿನಿಂದ</string>
 </resources>

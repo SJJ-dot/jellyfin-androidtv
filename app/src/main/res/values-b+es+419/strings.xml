@@ -63,7 +63,6 @@
     <string name="lbl_watched">Visto</string>
     <string name="lbl_sd">SD</string>
     <string name="lbl_runs">Duración</string>
-    <string name="lbl_min">" min"</string>
     <string name="lbl_ends">Termina</string>
     <string name="lbl_other_options">Otras opciones</string>
     <string name="lbl_recordings">Grabaciones</string>
@@ -174,7 +173,7 @@
     <string name="lbl_date_added">Fecha de adición</string>
     <string name="lbl_all_items">Todos los elementos</string>
     <string name="desc_debug">Proporcionar información adicional para la depuración</string>
-    <string name="lbl_goto_series">Ir a series</string>
+    <string name="lbl_goto_series">Ir a la serie</string>
     <string name="lbl_audio_output">Salida de audio</string>
     <string name="pref_audio_compat">Re-mezclar a estéreo</string>
     <string name="msg_cancel_entire_series">¿Estás seguro de querer cancelar esta SERIE COMPLETA\?</string>
@@ -272,7 +271,7 @@
     <string name="lbl_tomatoes">Tomates</string>
     <string name="lbl_stars">Estrellas</string>
     <string name="watch_count_overflow">99+</string>
-    <string name="lbl_playback_control_ends">Termina %1$shs</string>
+    <string name="lbl_playback_control_ends">Termina %1$s</string>
     <string name="lbl_sign_in">Por favor inicie sesión</string>
     <string name="lbl_subtitle_track">Seleccionar pista de subtítulos</string>
     <string name="lbl_audio_track">Seleccionar pista de audio</string>
@@ -556,4 +555,25 @@
     <string name="scheduled_in_next_24_hours">Programado para las siguientes 24 horas</string>
     <string name="past_24_hours">Últimas 24 horas</string>
     <string name="continue_listening">Continuar escuchando</string>
+    <string name="lbl_subtitle_text_color">Color del texto de los subtítulos</string>
+    <string name="lbl_subtitle_background_color">Color del fondo de los subtítulos</string>
+    <string name="video_start_delay">Retraso en el inicio del video</string>
+    <string name="segment_action_nothing">No hacer nada</string>
+    <string name="segment_action_skip">Saltar</string>
+    <string name="segment_type_intro">Intros</string>
+    <string name="segment_type_outro">Créditos</string>
+    <string name="segment_type_preview">Adelantos</string>
+    <string name="segment_type_recap">Resumen</string>
+    <string name="segment_type_unknown">Segmentos desconocidos</string>
+    <string name="prefer_exoplayer_ffmpeg_content">Usa FFmpeg para decodificar el audio, incluso si los códecs de la plataforma están disponibles.</string>
+    <string name="lbl_subtitle_text_stroke_color">Color de contorno de los subtítulos</string>
+    <string name="prefer_exoplayer_ffmpeg">Preferir FFmpeg para reproducir audio</string>
+    <string name="pref_mediasegment_actions">Acciones de segmentos de medios</string>
+    <string name="segment_type_commercial">Publicidad</string>
+    <string name="default_video_zoom">Modo de ampliación predeterminado</string>
+    <string name="segment_action_ask_to_skip">Preguntar para saltar</string>
+    <string name="preference_enable_trickplay">Habilitar previsualizaciones en el reproductor</string>
+    <string name="skip_forward_length">Duración del salto hacia adelante</string>
+    <string name="runtime_hours_minutes">%1$dh %2$dm</string>
+    <string name="runtime_minutes">%1$dm</string>
 </resources>

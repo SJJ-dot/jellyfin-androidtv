@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -36,7 +34,7 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.composable.overscan
+import org.jellyfin.androidtv.ui.composable.modifier.overscan
 
 @Composable
 private fun ConnectHelpAlert(
@@ -87,7 +85,7 @@ private fun ConnectHelpAlert(
 					),
 				) {
 					Icon(
-						imageVector = Icons.Default.Done,
+						painter = painterResource(R.drawable.ic_check),
 						contentDescription = null,
 						modifier = Modifier.size(ButtonDefaults.IconSize),
 					)

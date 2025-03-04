@@ -42,7 +42,7 @@
     <string name="lbl_add_to_queue">Kuyruğa ekle</string>
     <string name="msg_items_added">" öğe eklendi"</string>
     <string name="lbl_playlists">Oynatma Listeleri</string>
-    <string name="sum_enable_cinema_mode">Bir filmi başlatmadan önce mevcut tanıtımları ve önizlemeleri oynatın</string>
+    <string name="sum_enable_cinema_mode">Bir filmi başlatmadan önce mevcut introları ve önizlemeleri oynatın</string>
     <string name="lbl_enable_cinema_mode">Sinema modu</string>
     <string name="lbl_episodes">Bölümler</string>
     <string name="lbl_album">Albüm</string>
@@ -133,7 +133,6 @@
     <string name="lbl_last_played">"En son oynatılan "</string>
     <string name="lbl_directed_by">Yönetmen</string>
     <string name="lbl_ends">Bitiş Zamanı</string>
-    <string name="lbl_min">" dk"</string>
     <string name="lbl_runs">Süre</string>
     <string name="lbl_sd">SD</string>
     <string name="lbl_watched">İzlendi</string>
@@ -209,7 +208,7 @@
     <string name="msg_live_tv_next">Sıradaki %1$d saati yükle\?</string>
     <string name="lbl_load_guide_data">Rehber verilerini yükle</string>
     <string name="episode_missing_message_2">Bu bölüm kütüphanenizde eksik. Oynatma duracak.</string>
-    <string name="episode_missing_message">Bu bölüm kütüphanenizde eksil. Bunu atlayıp bir sonrakine geçmek ister misiniz\?</string>
+    <string name="episode_missing_message">Bu bölüm kütüphanenizde eksik. Bunu atlayıp bir sonrakine geçmek ister misiniz?</string>
     <string name="episode_missing">Bölüm eksik</string>
     <string name="no_player_message">Video oynatma özellikli bir uygulamanız olmadığı görülüyor. Bu seçenek, video içeriğini oynatmak için 3. taraf bir uygulama yüklemenizi gerektirir.</string>
     <string name="no_player">Oynatıcı yok</string>
@@ -548,12 +547,21 @@
     <string name="past_24_hours">Son 24 saat</string>
     <string name="lbl_subtitle_background_color">Altyazı arka plan rengi</string>
     <string name="lbl_subtitle_text_stroke_color">Altyazı kontur rengi</string>
-    <string name="pref_subtitles_size_small">Küçük</string>
-    <string name="pref_subtitles_size_large">Büyük</string>
-    <string name="pref_subtitles_size_very_large">Çok büyük</string>
     <string name="lbl_subtitle_text_color">Altyazı metin rengi</string>
-    <string name="pref_subtitles_size_very_small">Çok küçük</string>
-    <string name="pref_subtitles_size_normal">Normal</string>
     <string name="prefer_exoplayer_ffmpeg">Ses çalma için FFmpeg\'i tercih et</string>
     <string name="prefer_exoplayer_ffmpeg_content">Platform codec bileşenleri mevcut olsa bile ses kodunu çözmek için FFmpeg kullan.</string>
+    <string name="segment_action_ask_to_skip">Atlamak için sor</string>
+    <string name="default_video_zoom">Varsayılan yakınlaştırma modu</string>
+    <string name="video_start_delay">Video başlatma gecikmesi</string>
+    <string name="segment_type_preview">Önizlemeler</string>
+    <string name="segment_type_recap">Özetler</string>
+    <string name="segment_type_unknown">Bilinmeyen segmentler</string>
+    <string name="segment_action_nothing">Hiçbir şey yapma</string>
+    <string name="segment_action_skip">Atla</string>
+    <string name="pref_mediasegment_actions">Medya segmenti eylemleri</string>
+    <string name="segment_type_commercial">Reklamlar</string>
+    <string name="segment_type_intro">İntrolar</string>
+    <string name="segment_type_outro">Kapanış jeneriği</string>
+    <string name="preference_enable_trickplay">Video oynatıcıda trickplay özelliğini etkinleştir</string>
+    <string name="skip_forward_length">İleri atlama uzunluğu</string>
 </resources>

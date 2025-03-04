@@ -9,7 +9,6 @@ import java.util.UUID
 class OptionsItemSeekbar(
 	private val context: Context
 ) : OptionsItemMutable<Int>() {
-
 	var content: String? = null
 	var min: Int = 0
 	var max: Int = 100
@@ -32,8 +31,9 @@ class OptionsItemSeekbar(
 			it.isEnabled = dependencyCheckFun() && enabled
 			it.isVisible = visible
 			it.title = title
-			it.min = min
+			// Max must be set before min because the setter of min checks if the value is below the current value of max
 			it.max = max
+			it.min = min
 			it.seekBarIncrement = increment
 			it.value = binder.get()
 			it.showSeekBarValue = true
