@@ -1,4 +1,4 @@
-name: App / Build Release with Branch
+name: App / Build Release with Tag
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Release with Branch
+    name: Build Release with Tag
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
