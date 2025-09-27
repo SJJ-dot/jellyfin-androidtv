@@ -7,6 +7,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.await
+import com.tencent.bugly.crashreport.CrashReport
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,9 +23,10 @@ import java.util.concurrent.TimeUnit
 class JellyfinApplication : Application() {
 	override fun onCreate() {
 		super.onCreate()
-
 		// Don't run in ACRA service
 		if (ACRA.isACRASenderServiceProcess()) return
+
+		CrashReport.initCrashReport(applicationContext, "655cfb0aa2", false)
 
 		val notificationsRepository by inject<NotificationsRepository>()
 		notificationsRepository.addDefaultNotifications()

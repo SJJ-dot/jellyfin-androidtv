@@ -25,7 +25,17 @@ jobs:
       - name: Modify JellyfinApplication.kt
         run: |
           sed -i '/class JellyfinApplication : Application() {/a \ \ \ \ override fun isDeviceProtectedStorage() = false' app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+          # 添加 Bugly CrashReport 导入语句
+          sed -i '/import android.app.Application/a \import com.tencent.bugly.crashreport.CrashReport' app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+          sed -i '/if (ACRA.isACRASenderServiceProcess()) return/a \    CrashReport.initCrashReport(applicationContext, "655cfb0aa2", false)' app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
           cat app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+      - name: Modify build.gradle.kts
+        run: |
+          # 在 dependencies 块中添加 Bugly 崩溃上报依赖
+          sed -i '/dependencies {/a \    implementation("com.tencent.bugly:crashreport:latest.release")' app/build.gradle.kts
+          # 验证修改结果
+          cat app/build.gradle.kts
+
 
       - name: Setup Java
         uses: actions/setup-java@v4.7.0
