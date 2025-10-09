@@ -1,3 +1,4 @@
+<h1>魔百盒崩溃修复。如果需要其他版本可以在issues中留言</h1>
 <h1 align="center">Jellyfin Android TV</h1>
 <h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
 
