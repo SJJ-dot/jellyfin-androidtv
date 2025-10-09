@@ -49,6 +49,8 @@ jobs:
       - name: Assemble release APKs
         run: |
           ./gradlew assembleRelease
+        env:
+          JELLYFIN_VERSION: ${{ github.event.inputs.tag }}
 
       - name: Sign APK
         uses: r0adkll/sign-android-release@v1
