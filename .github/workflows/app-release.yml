@@ -1,0 +1,87 @@
+name: App / Build Release with Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Release with Tag
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: jellyfin/jellyfin-androidtv
+          ref: ${{ github.event.inputs.tag }}
+          fetch-depth: 0
+
+      - name: Modify JellyfinApplication.kt
+        run: |
+          sed -i '/class JellyfinApplication : Application() {/a \ \ \ \ override fun isDeviceProtectedStorage() = false' app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+          # 添加 Bugly CrashReport 导入语句
+          sed -i '/import android.app.Application/a \import com.tencent.bugly.crashreport.CrashReport' app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+          sed -i '/if (ACRA.isACRASenderServiceProcess()) return/a \    CrashReport.initCrashReport(applicationContext, "655cfb0aa2", false)' app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+          cat app/src/main/java/org/jellyfin/androidtv/JellyfinApplication.kt
+      - name: Modify build.gradle.kts
+        run: |
+          # 在 dependencies 块中添加 Bugly 崩溃上报依赖
+          sed -i '/dependencies {/a \    implementation("com.tencent.bugly:crashreport:latest.release")' app/build.gradle.kts
+          # 验证修改结果
+          cat app/build.gradle.kts
+
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.3.0
+
+      - name: Assemble release APKs
+        run: |
+          ./gradlew assembleRelease
+        env:
+          JELLYFIN_VERSION: ${{ github.event.inputs.tag }}
+
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          # override default build-tools version (33.0.0) -- optional
+          BUILD_TOOLS_VERSION: "35.0.0"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.JELLYFIN_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          release_name: Release ${{ github.event.inputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.JELLYFIN_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          asset_name: jellyfin-androidtv-${{ github.event.inputs.tag }}.apk
+          asset_content_type: application/vnd.android.package-archive
